@@ -46,3 +46,17 @@ Any OpenAI-compatible endpoint works via `MODEL_BASE_URL` / `MODEL_NAME`.
 `ADAPTMACH_MOCK=1` runs an offline scripted brain for testing only (clearly labelled MOCK in the UI).
 
 Every run is saved to `runs/` and can be replayed from the UI.
+
+## Demo
+
+Open http://localhost:8000 and press **▶ Play demo**: a ~2.5 minute guided replay of a recorded live run
+(every design was written by `muse-spark-1.3`, every verdict comes from `physics.py`):
+
+1. **Hurricane drone.** The day-0 agent designs a drone to carry a pizza San Francisco → Fremont (45 km, 25 m/s winds, rain). Each attempt flies in a Three.js 3D storm, and the physics result decides what happens: out of battery over the bay, blown backwards, flipped by a gust, or delivered.
+2. **What it learned.** The agent reviews the drone's crashes and writes a lesson or a Python tool.
+3. **Teaching other machines.** The lesson is tested live on machines it never trained on (a Mars jetpack and a storm supply drone). It is kept only if they need fewer attempts. Otherwise it is rolled back.
+4. **Before vs after.** The day-0 agent and the trained agent race to build a new machine (an Iron Man suit), shown as a 3D model drawn from each design.
+
+Everything is also live: the mission and prototyping buttons call the model in real time (about 25 s per design iteration).
+
+Notes: `muse-spark-1.3` is a reasoning model, so `llm.py` sends `reasoning_effort: "low"` (at default effort it spent the whole token budget thinking and returned empty content).

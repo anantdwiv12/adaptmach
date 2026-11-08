@@ -54,8 +54,10 @@ class Client:
                     continue
                 return content
             except urllib.error.HTTPError as e:
-                last = f"HTTP {e.code}: {e.read().decode(errors='replace')[:500]}"
-                if e.code in (400, 401, 403, 404):
+                err = e.read().decode(errors='replace')[:500]
+                last = f"HTTP {e.code}: {err}"
+                # Meta's content filter sometimes blocks harmless engineering prompts; retry those
+                if e.code in (400, 401, 403, 404) and "content_policy" not in err:
                     break
             except Exception as e:  # network / timeout / parse
                 last = repr(e)

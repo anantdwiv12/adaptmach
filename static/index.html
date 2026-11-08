@@ -49,6 +49,7 @@ h1{font-size:40px;line-height:1.08;margin:6px 0 8px;letter-spacing:-.02em}
 .storm{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px}
 .stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#05080d;aspect-ratio:16/8.2;min-height:340px;min-width:0}
 #storm{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lbl3d{position:absolute;transform:translate(-50%,-50%);font:700 11px var(--mono);letter-spacing:.14em;color:#dbe9ff;text-shadow:0 1px 5px #000,0 0 10px #000;pointer-events:none;white-space:nowrap}
 .hud{position:absolute;font:600 12px var(--mono);color:#cfe3ff;text-shadow:0 1px 3px #000}
 .hud.tl{top:14px;left:16px}.hud.tr{top:14px;right:16px;text-align:right}
 .hud .big{font:800 22px var(--mono);color:#fff}
@@ -96,7 +97,7 @@ h1{font-size:40px;line-height:1.08;margin:6px 0 8px;letter-spacing:-.02em}
 .skill.rej .se{color:#ff9aa4}
 details summary{cursor:pointer;color:var(--mute);font:11.5px var(--mono);margin-top:5px}
 pre{background:#070a0e;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font:11.5px/1.5 var(--mono);color:#cfe3ff;max-height:260px;margin:6px 0 0;white-space:pre-wrap}
-.lab{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:14px}
+.lab{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;margin:0 0 16px}
 .wb{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px}
 .wb .wh{display:flex;gap:8px;align-items:center;font:700 12.5px var(--mono)}
 .wb .wh .ph{font-size:10px;padding:2px 6px;border-radius:4px;background:#2c2140;color:var(--violet);text-transform:uppercase;letter-spacing:.06em}
@@ -150,6 +151,12 @@ pre{background:#070a0e;border:1px solid var(--line);border-radius:8px;padding:10
 .adaptbar input{flex:1;min-width:220px}
 .adaptbar .k{white-space:nowrap}
 
+#demoCap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;width:max-content;max-width:min(1100px,92vw);padding:14px 22px;border-radius:14px;background:rgba(8,11,16,.9);border:1px solid #2a3644;backdrop-filter:blur(10px);font:600 19px/1.45 -apple-system,BlinkMacSystemFont,"Inter",sans-serif;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none}
+#demoCap b{color:var(--accent)}
+#demoCard{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:radial-gradient(ellipse at center,#141d2a,#05070b 70%);text-align:center;transition:opacity .6s;padding:24px}
+#demoCard .t{font:800 72px/1 var(--mono);letter-spacing:.08em} #demoCard .t b{color:var(--accent)}
+#demoCard .s{font-size:24px;line-height:1.4;color:#d5dde6;max-width:920px}
+#demoCard .m{font:14px var(--mono);color:var(--mute)}
 footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
 #log .le{border-top:1px dashed #1b232c;padding:7px 0;font:12px var(--mono);color:#aab6c2}
 #toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:50}
@@ -170,6 +177,7 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
   <nav><a href="#s-storm">Storm run</a><a href="#s-learn">What it learned</a><a href="#s-race">Fast prototyping</a><a href="#s-machines">Machines</a></nav>
   <div class="brain" id="brain">connecting…</div>
   <span id="busy"></span>
+  <button class="primary" id="demoBtn">▶ Play demo</button>
 </header>
 
 <!-- 1. STORM -->
@@ -179,7 +187,7 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
   <p class="sub">San Francisco → Fremont, 45 km, 25 m/s winds and heavy rain, carrying a pizza. Every attempt is real agent-written code, graded by a coupled physics simulator. Watch what each design actually does in the storm.</p>
   <div class="row" style="margin-bottom:12px">
     <button class="chipbtn" data-mission='{"text":"Deliver a pizza from San Francisco to Fremont through a hurricane with heavy rain"}'>🍕 Hurricane pizza · SF → Fremont</button>
-    <button class="chipbtn" data-mission='{"text":"a rescue drone that carries a 15 kg medical kit 20 km through an 18 m/s storm with heavy rain"}'>🚑 Medical kit through a storm</button>
+    <button class="chipbtn" data-mission='{"text":"a supply drone that carries a 15 kg crate 20 km through an 18 m/s storm with heavy rain"}'>📦 Supply crate through a storm</button>
     <button class="chipbtn" data-mission='{"text":"a parcel drone that delivers a 5 kg package 30 km into a 15 m/s gale"}'>📦 Parcel into a gale</button>
   </div>
   <div class="storm">
@@ -201,8 +209,9 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
 <section id="s-learn">
   <div class="eyebrow">02 · What the machine learned</div>
   <h2>Failures become skills, and a skill is only kept if it helps on machines it has never seen.</h2>
-  <p class="sub">After each training job, the agent reviews its own failed designs and writes one new skill: a lesson or a Python tool. The skill is tested on held-out machines (Jetpack, Rescue Drone). It's <b style="color:var(--ok)">adopted</b> only if they need fewer attempts. Otherwise it's <b style="color:var(--bad)">rolled back</b>.</p>
+  <p class="sub">After each training job, the agent reviews its own failed designs and writes one new skill: a lesson or a Python tool. The skill is tested on held-out machines it never trains on: a Mars jetpack and a storm supply drone. It's <b style="color:var(--ok)">adopted</b> only if they need fewer attempts. Otherwise it's <b style="color:var(--bad)">rolled back</b>.</p>
   <div class="row" style="margin-bottom:14px"><button class="primary" data-act="learn">▶ Start learning run</button><span class="k" id="learnHint"></span></div>
+  <div class="lab" id="lab"></div>
   <div class="learn">
     <div class="card">
       <div class="bignum" id="bignum"></div>
@@ -214,7 +223,6 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
       <div class="skills" id="skills"></div>
     </div>
   </div>
-  <div class="lab" id="lab"></div>
 </section>
 
 <!-- 3. PROTOTYPING -->
@@ -224,7 +232,7 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
   <p class="sub">Pick a machine. The agent writes design code, physics tests it, and the failures steer the next iteration until the design is physically valid. Every frame is drawn from the agent's actual design.</p>
   <div class="racectl">
     <button class="chipbtn" data-proto='{"brief_id":"ironman"}'>🦾 Iron Man suit</button>
-    <button class="chipbtn" data-proto='{"text":"a rescue drone that carries a 15 kg medical kit 20 km through an 18 m/s storm with heavy rain"}'>🚑 Storm rescue drone</button>
+    <button class="chipbtn" data-proto='{"text":"a supply drone that carries a 15 kg crate 20 km through an 18 m/s storm with heavy rain"}'>📦 Storm supply drone</button>
     <button class="chipbtn" data-proto='{"text":"a cinema camera drone that carries a 4 kg camera for 30 minutes, no wider than 1.2 m"}'>🎥 Cinema drone</button>
     <button class="chipbtn" data-proto='{"text":"a cargo drone that carries 20 kg for 15 minutes","planet":"mars"}'>🔴 Mars cargo drone</button>
     <button class="chipbtn" data-proto='{"text":"a hoverboard for a 75 kg rider for 5 minutes with safe downwash"}'>🛹 Hoverboard</button>
@@ -254,6 +262,8 @@ footer{max-width:1440px;margin:30px auto 0;padding:10px 28px 60px}
   <div class="row" style="margin-top:14px"><select id="runs"><option value="">Replay a saved run…</option></select><button id="liveBtn" style="display:none">● Back to live</button></div>
 </footer>
 <div id="toasts"></div>
+<div id="demoCap"></div>
+<div id="demoCard"></div>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -301,7 +311,7 @@ function machineSVG(d,b,o={}){
   const planet=String(b.planet||"earth").toLowerCase();
   let svg=`<svg viewBox="0 0 ${W} ${H}" class="msvg"><rect width="${W}" height="${H}" fill="${PLANETBG[planet]||PLANETBG.earth}"/><rect width="${W}" height="${H}" fill="url(#bpgrid)"/>`;
   if(!d||d.n_rotors==null){
-    return svg+`<text x="${W/2}" y="${H/2-4}" fill="#ff4d5e" font-family="ui-monospace,monospace" font-weight="700" font-size="${Math.max(11,W/24)}" text-anchor="middle">✗ design code crashed</text><text x="${W/2}" y="${H/2+16}" fill="#8592a0" font-family="ui-monospace,monospace" font-size="${Math.max(9,W/38)}" text-anchor="middle">no machine to build</text></svg>`;
+    return svg+`<text x="${W/2}" y="${H/2-4}" fill="#ff4d5e" font-family="ui-monospace,monospace" font-weight="700" font-size="${Math.max(11,W/24)}" text-anchor="middle">${o.msg||"✗ design code crashed"}</text><text x="${W/2}" y="${H/2+16}" fill="#8592a0" font-family="ui-monospace,monospace" font-size="${Math.max(9,W/38)}" text-anchor="middle">no machine to build</text></svg>`;
   }
   const {n,D,duct,pts,span}=geom(d), kind=kindOf(b), human=kind==="human"||kind==="deck";
   const tilt=0.3, rotorH= kind==="deck"?0.24 : kind==="human"?1.28 : 0.38+0.13*span;
@@ -363,7 +373,7 @@ const chips=sim=>sim&&sim.checks?`<div class="cks">${sim.checks.map(k=>`<span cl
 /* ------------------------------------------------------------------ storm simulation view */
 const storm={q:[], cur:null, t0:0, hold:0, history:[], trail:[], parts:[], crashed:false};
 function outcomeOf(ev){
-  if(ev.error) return {k:"glitch", label:"✗ the design code crashed: nothing to fly", ok:false};
+  if(ev.error) return {k:"glitch", label:/^model error/.test(ev.error)?"✗ the model call was blocked: no design this attempt":"✗ the design code crashed: nothing to fly", ok:false};
   const C=ev.sim.checks, f=n=>C.some(c=>c.name===n&&!c.ok), m=ev.sim.report.mission||{};
   if(f("valid_design")) return {k:"glitch", label:"✗ invalid design: "+(C[0]?.detail||""), ok:false};
   if(f("battery_power")) return {k:"nopower", label:"✗ battery can't deliver enough power to climb", ok:false};
@@ -429,8 +439,15 @@ function drawDrone(x,y,d,rot,alpha,t){
   ctx.restore();
 }
 function spawn(x,y,water){ for(let i=0;i<34;i++) storm.parts.push({x,y,vx:(Math.random()-.5)*160,vy:-60-Math.random()*170,life:1,c:water?"rgba(170,215,255,":"rgba(255,150,60,"}); }
+function stormLogic(now){
+  const it=storm.cur; if(!it){ storm.view=null; return; }
+  const el=(now-storm.t0)/1000*(storm.q.length?1.7:1), st=droneState(it.o,el);
+  if(st.done){ if(!storm.hold) storm.hold=now; if(storm.q.length&&now-storm.hold>2200) nextFlight(now); }
+  hud(it,st); storm.view={it,st};
+}
 function frame(now){
   requestAnimationFrame(frame);
+  if(window.S3D&&S3D.ok){ stormLogic(now); try{ S3D.draw(storm.view,now/1000); }catch(e){ console.error(e); S3D.ok=false; cv.style.display=""; } return; }
   if(!scene){ resize(); if(!scene) return; }
   const dt=Math.min(0.05,(now-(lastT||now))/1000); lastT=now; const T=now/1000;
   const s=scene, W=CW, H=CH, it=storm.cur, b=it?it.t.brief:{wind_m_s:25,rain:true};
@@ -533,7 +550,7 @@ function handle(ev){
     case "attempt": {
       const t=tasks[ev.task]; if(!t) break; t.attempts.push(ev);
       if(t.phase==="training") learn.stage=2;
-      if(+t.brief.distance_km>0 && (!t.race || t.lane==="trained")) stormEnqueue(t,ev);
+      if(+t.brief.distance_km>0 && (["imagine","adapt","training"].includes(t.phase) || (t.phase==="race"&&t.lane==="trained"))) stormEnqueue(t,ev);
       addLog(t,ev); break; }
     case "task_end": {
       const t=tasks[ev.task]; if(!t) break; t.t1=ev.t; t.ended=true; t.solved=ev.solved; t.stopped=!!ev.stopped; t.n=ev.attempts;
@@ -575,7 +592,7 @@ function renderHeader(){
 function wbCard(t,o={}){
   const a=[...t.attempts].reverse().find(x=>x.design)||t.attempts[t.attempts.length-1], last=t.attempts[t.attempts.length-1];
   const res=t.ended?(t.solved?`<div class="res ok">✓ valid design in ${t.n} attempt${t.n>1?"s":""}</div>`:`<div class="res bad">✗ ${t.stopped?"stopped":"no valid design"} after ${t.attempts.length}</div>`):`<div class="res run"><span class="dot"></span>attempt ${t.attempts.length+1}: writing design code…</div>`;
-  return `<div class="wb"><div class="wh"><span class="ph">${esc(PH[t.phase]||t.phase)}</span>${esc(t.brief.name)}<span class="st2">v${t.version}</span></div>${machineSVG(last&&last.error?null:(a&&a.design),t.brief,{w:o.w||300,h:o.h||170,span:a&&a.sim&&a.sim.report.span_m,bad:t.ended&&!t.solved,good:t.ended&&t.solved})}${a&&a.sim?chips(a.sim):""}${res}</div>`;
+  return `<div class="wb"><div class="wh"><span class="ph">${esc(PH[t.phase]||t.phase)}</span>${esc(t.brief.name)}<span class="st2">v${t.version}</span></div>${machineSVG(last&&last.error?null:(a&&a.design),t.brief,{msg:last&&/^model error/.test(last.error||"")?"✗ model call blocked by API filter":null,w:o.w||300,h:o.h||170,span:a&&a.sim&&a.sim.report.span_m,bad:t.ended&&!t.solved,good:t.ended&&t.solved})}${a&&a.sim?chips(a.sim):""}${res}</div>`;
 }
 function renderLearn(){
   const pts=learn.points.length?learn.points:(S&&S.versions||[]).map((v,i)=>({kind:i?"adopt":"base",v:v.mean,label:i?"v"+v.version:"day 0"}));
@@ -608,7 +625,7 @@ function renderLearn(){
   $("#skills").innerHTML=sk||`<div class="empty">No skills yet. They appear here as the agent learns.</div>`;
   const ts=Object.values(tasks).filter(t=>["baseline","candidate","training"].includes(t.phase));
   const active=ts.filter(t=>!t.ended), show=(active.length?active:ts.slice(-3)).slice(-4);
-  $("#lab").innerHTML=show.map(t=>wbCard(t)).join("");
+  $("#lab").innerHTML=show.map(t=>wbCard(t,{w:460,h:250})).join("");
 }
 const REQ=b=>[b.payload_kg!=null&&`payload ${b.payload_kg} kg`, b.endurance_min&&`${b.endurance_min} min`, b.distance_km&&`${b.distance_km} km trip`, b.wind_m_s&&`${b.wind_m_s} m/s wind`, b.rain&&"rain", b.max_span_m&&`span ≤ ${b.max_span_m} m`, b.max_mass_kg&&`mass ≤ ${b.max_mass_kg} kg`, b.max_downwash_m_s&&`downwash ≤ ${b.max_downwash_m_s} m/s`, b.planet&&b.planet!=="earth"&&b.planet.toUpperCase()].filter(Boolean);
 function statGrid(r){ if(!r||r.mass_kg==null) return ""; const third=r.mission?`<div>${r.mission.flight_time_min??"∞"} min<small>${r.mission.distance_km} km trip</small></div>`:`<div>${r.endurance_min} min<small>endurance</small></div>`;
@@ -626,11 +643,12 @@ function renderProto(){
   const iters=t.attempts.map(x=>{ const ok=x.sim&&x.sim.ok, f=x.sim?x.sim.checks.filter(c=>!c.ok):[];
     return `<div class="iter ${ok?"ok":""}"><b>#${x.n}</b> ${ok?"✓ all checks pass":x.error?"✗ code error":"✗ "+f.map(c=>SHORT[c.name]||c.name).join(", ")} <span style="color:var(--mute);float:right">${secs(x.t)} s</span>${!ok?`<div class="d">${esc(x.error||(f[0]&&f[0].detail)||"")}</div>`:""}</div>`; }).reverse().join("");
   el.innerHTML=`<div class="proto">
-    <div class="card" style="padding:12px">${machineSVG(last&&last.error?null:(a&&a.design),b,{w:720,h:380,span:a&&a.sim&&a.sim.report.span_m,good:t.solved,bad:t.ended&&!t.solved})}
+    <div class="card" style="padding:12px"><div id="p3dslot" style="position:relative;aspect-ratio:720/380;border-radius:12px;overflow:hidden">${window.M3D?`<div class="lbl3d" style="left:auto;right:12px;top:16px;transform:none;color:#8fdcff">3D · BUILT FROM THE AGENT'S DESIGN</div>${last&&last.error?`<div class="lbl3d" style="left:50%;top:50%;color:#ff4d5e;font-size:15px">✗ design code crashed</div>`:""}`:machineSVG(last&&last.error?null:(a&&a.design),b,{w:720,h:380,span:a&&a.sim&&a.sim.report.span_m,good:t.solved,bad:t.ended&&!t.solved})}</div>
       ${a?`<div style="margin-top:8px">${chips(a.sim)}</div><div class="spec" style="font:12px var(--mono);color:var(--mute);margin-top:6px">${specLine(a.design)}</div>${statGrid(a.sim.report)}`:""}</div>
     <div class="card side"><div><div class="k">${esc(PH[t.phase]||t.phase)} · agent v${t.version}</div><div style="font-weight:750;font-size:19px;margin-top:3px">${esc(b.name)}</div><div class="meta" style="margin:4px 0 8px">${esc(b.prompt)}</div><div class="req">${REQ(b).map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
       ${status}<div class="k">Iterations (newest first)</div><div class="iters">${iters||`<div class="meta">waiting for the first design…</div>`}</div></div></div>
     <div class="strip" style="margin-top:12px">${t.attempts.map(x=>`<div class="thumb ${x.sim&&x.sim.ok?"ok":"bad"}">${machineSVG(x.design,b,{w:132,h:88})}<span class="n">#${x.n}</span><span class="m">${x.sim&&x.sim.ok?"✓":"✗"}</span></div>`).join("")}</div>`;
+  if(window.M3D){ const slot=$("#p3dslot"); if(slot){ slot.prepend(M3D.canvas); M3D.show(last&&last.error?null:(a&&a.design),b,t.solved?"good":(t.ended?"bad":"run")); } }
 }
 function raceHTML(r){
   const brief=r.brief;
@@ -671,7 +689,7 @@ function renderAll(){ renderHeader(); renderLearn(); renderProto(); renderMachin
     $("#idle p").innerHTML=mt?`<span class="dot"></span>The agent is writing design code for the <b>${esc(mt.brief.name)}</b>. Each live iteration takes about 25 s, then it flies here.`:"No storm flights yet. Press the button: the agent writes the drone's design, and physics decides whether it survives."; } }
 
 /* ------------------------------------------------------------------ actions */
-function toast(t,cls=""){ const e=document.createElement("div"); e.className="toast "+cls; e.textContent=t; $("#toasts").append(e); setTimeout(()=>e.remove(),6000); }
+function toast(t,cls=""){ if(demoOn) return; const e=document.createElement("div"); e.className="toast "+cls; e.textContent=t; $("#toasts").append(e); setTimeout(()=>e.remove(),6000); }
 async function post(url,body){
   try{ const r=await fetch(url,{method:"POST",body:JSON.stringify(body||{})}); const j=await r.json(); if(!r.ok){ toast(j.error||"request failed","bad"); return false; } return true; }
   catch(e){ toast("server offline","bad"); return false; }
@@ -687,7 +705,8 @@ document.addEventListener("click",async e=>{
   else if(b.dataset.m){ selMachine=b.dataset.m; renderMachines(); }
   else if(b.id==="adaptGo"){ const sel=machines().find(([n])=>n===selMachine); if(!sel||!sel[1].id) return toast("click a machine from the library first","bad"); const ins=$("#adaptTxt").value.trim(); if(!ins) return toast("type a change, e.g. make it fly on Mars","bad"); await post("/api/adapt",{brief_id:sel[1].id,instruction:ins}); }
   else if(b.dataset.replay!=null){ const it=storm.history[+b.dataset.replay]; if(it){ storm.q.unshift(it); nextFlight(); } }
-  else if(b.id==="liveBtn"){ replay=null; b.style.display="none"; resetUI(); since=0; }
+  else if(b.id==="liveBtn"){ demoOn=false; cap(""); $("#demoCard").style.display="none"; replay=null; b.style.display="none"; resetUI(); since=0; }
+  else if(b.id==="demoBtn"){ if(demoOn){ demoOn=false; await sleep(400); } playDemo(); }
 });
 
 /* ------------------------------------------------------------------ polling + replay */
@@ -720,7 +739,278 @@ $("#runs").onchange=async e=>{
   }
   S.running=false; renderAll();
 };
+/* ------------------------------------------------------------------ guided demo (replays recorded live runs) */
+let demoOn=false, seq=0;
+const DEMO_RUNS={run:"20261107-155614"};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function cap(html){ const c=$("#demoCap"); c.innerHTML=html; c.style.display=html?"block":"none"; }
+function go(id){ const el=id==="s-storm"?document.querySelector(".stage"):document.getElementById(id); const off={"s-storm":80,"lab":190}[id]??62;
+  window.scrollTo({top:Math.max(0,el.getBoundingClientRect().top+window.scrollY-off),behavior:"smooth"}); }
+async function card(s,m,ms){ const c=$("#demoCard"); c.innerHTML=`<div class="t">ADAPT<b>MACH</b></div><div class="s">${s}</div><div class="m">${m}</div>`; c.style.opacity=0; c.style.display="flex"; await sleep(40); c.style.opacity=1; await sleep(ms); c.style.opacity=0; await sleep(650); c.style.display="none"; }
+async function feed(evs,delay){ for(const e of evs){ if(!demoOn) throw "stop"; const ev={...e,i:seq++}; handle(ev); if(ev.type==="adopt") S.version=ev.version; if(storm.q.length&&!storm.cur) nextFlight(); renderAll(); const d=typeof delay==="function"?delay(ev):delay; if(d) await sleep(d); } }
+const stormIdle=()=>!storm.q.length&&storm.cur&&storm.hold&&performance.now()-storm.hold>2000;
+async function waitStorm(){ const t0=performance.now(); if(!storm.cur&&!storm.q.length) return; while(demoOn&&!stormIdle()&&performance.now()-t0<120000) await sleep(200); if(!demoOn) throw "stop"; }
+const taskEvs=(evs,tid)=>evs.filter(e=>e.task===tid);
+const firstTask=(evs,pred)=>{ const e=evs.find(x=>x.type==="task_start"&&pred(x)); return e&&e.task; };
+const isStorm=e=>e.phase==="imagine"&&+e.brief.distance_km>0;
+async function playDemo(){
+  demoOn=true; replay="recorded live run · Meta muse-spark-1.3"; $("#liveBtn").style.display=""; resetUI(); live=true; seq=0;
+  storm.cur=null; storm.q=[]; storm.trail=[]; storm.hold=0; $("#idle").style.display=""; $("#cap").style.display="none"; $("#hudL").innerHTML=$("#hudR").innerHTML=""; $("#hudL")._v=$("#hudR")._v=$("#cap")._v="";
+  S={brain:"LIVE", running:false, library:[], rejected:[], versions:[], version:0, solved:{}};
+  renderAll(); renderStormSide();
+  try{
+    const B=await fetch("/api/run?id="+DEMO_RUNS.run).then(r=>r.ok?r.json():{events:[]}).catch(()=>({events:[]}));
+    const E=(B.events||[]).map((e,k)=>({...e,_k:k}));
+    const starts=E.filter(e=>e.type==="task_start"), byPhase=ph=>starts.filter(e=>e.phase===ph);
+    const tr=byPhase("training"), first=tr[0];
+    const used=new Set(); const take=list=>{ list.forEach(e=>used.add(e._k)); return list; };
+    window.scrollTo({top:0});
+    await card("An AI engineer that designs machines in code, and teaches itself physics from its own failures.","built on Meta Muse Spark (muse-spark-1.3) · replay of a recorded live run",4200);
+    const rs0=E.find(e=>e.type==="run_start"); if(rs0) await feed(take([rs0]),0);
+    // SCENE 1 · the drone crosses the bay
+    let firstEnd=-1;
+    if(first){ go("s-storm"); cap(`<b>Day 0.</b> The agent has never built anything. Mission: carry a pizza <b>San Francisco → Fremont</b>, 45 km through 25 m/s hurricane winds and rain. It writes the drone's design in Python, and physics flies it.`);
+      await sleep(2800); const evs=take(E.filter(e=>e.task===first.task)); firstEnd=evs[evs.length-1]._k; await feed(evs,0); await waitStorm();
+      const n=evs.filter(e=>e.type==="attempt").length, ok=evs.some(e=>e.type==="task_end"&&e.solved);
+      cap(ok?`🍕 Delivered on attempt <b>${n}</b>. Every crash before it was a real physics result.`:`Day 0 could not get through in ${n} attempts.`); await sleep(3800); }
+    // SCENE 2 · what it learned from the drone
+    const refl=E.find(e=>e.type==="reflecting"&&e._k>firstEnd), cand=E.find(e=>e.type==="candidate"&&e._k>firstEnd);
+    if(refl&&cand){ go("s-learn"); await feed(take([refl]),0); cap(`🧠 It reviews the drone's crashes and writes down what it learned…`); await sleep(2600);
+      await feed(take([cand]),0); const sk=cand.skill, body=String(sk.content||"").replace(/\s+/g," ");
+      cap(`📝 <b>What the drone taught it:</b> “${esc(sk.description||sk.name)}”<br><span style="font-size:15px;color:#aab6c2">${sk.kind==="tool"?"a Python tool it wrote: ":""}${esc(body.slice(0,170))}${body.length>170?"…":""}</span>`); await sleep(6500); }
+    // SCENE 3 · teaching other machines in real time
+    const dec=cand&&E.find(e=>(e.type==="adopt"||e.type==="rollback")&&e._k>cand._k);
+    if(cand&&dec){ const base=E.find(e=>e.type==="baseline"), baseTasks=byPhase("baseline").map(e=>e.task);
+      go("lab");
+      cap(`<b>Other machines.</b> First, how the day-0 agent does on machines it has never seen: a <b>Mars jetpack</b> and a <b>storm supply drone</b>.`);
+      await feed(take(E.filter(e=>baseTasks.includes(e.task))),ev=>ev.type==="attempt"?450:120); if(base) await feed(take([base]),0);
+      if(base) cap(`Day 0 needs <b>${base.mean.toFixed(1)} attempts</b> on average to build them.`); await sleep(2800);
+      const candTasks=starts.filter(e=>e.phase==="candidate"&&e._k>cand._k&&e._k<dec._k).map(e=>e.task);
+      cap(`Now they're built again, live, <b>with the drone's lesson</b>.`);
+      await feed(take(E.filter(e=>candTasks.includes(e.task))),ev=>ev.type==="attempt"?650:150);
+      await feed(take([dec]),0);
+      cap(dec.type==="adopt"?`✅ <b>The lesson transfers.</b> Other machines: ${dec.before.toFixed(1)} → <b style="color:var(--ok)">${dec.after.toFixed(1)}</b> attempts. Adopted as agent v${dec.version}.`:`↩ <b style="color:var(--bad)">It didn't transfer</b> (${dec.before.toFixed(1)} → ${dec.after.toFixed(1)} attempts), so it's rolled back. Only lessons that help other machines are kept.`);
+      await sleep(4500); }
+    // SCENE 3b · the rest of training, fast
+    const end=E.find(e=>e.type==="run_end");
+    const rest=E.filter(e=>!used.has(e._k)&&end&&e._k<=end._k&&!(e.race));
+    if(rest.length){ go("s-learn"); cap(`It keeps going: more training jobs, more lessons, and each one is tested on the other machines.`);
+      await feed(take(rest),ev=>{ switch(ev.type){
+        case "candidate": cap(`🧪 New lesson <b>${esc(ev.skill.name)}</b>: does it help the other machines?`); return 1500;
+        case "adopt": cap(`✅ Kept: other machines ${ev.before.toFixed(1)} → <b style="color:var(--ok)">${ev.after.toFixed(1)}</b> attempts (agent v${ev.version}).`); return 2400;
+        case "rollback": cap(`↩ Rolled back <b>${esc(ev.skill.name)}</b>: it didn't help.`); return 1600;
+        case "run_end": cap(`Learning complete: other machines go from <b>${ev.baseline.toFixed(1)} → <span style="color:var(--ok)">${ev.final.toFixed(1)}</span></b> attempts.`); return 4200;
+        case "attempt": return 90;
+        default: return 30; } }); }
+    // SCENE 4 · new machines, before vs after learning
+    for(const rs of E.filter(e=>e.type==="race_start")){
+      go("s-race"); cap(`<b>Before vs after.</b> A brand-new machine: <b>${esc(rs.brief.name)}</b>. The day-0 agent and the trained agent build it side by side.`);
+      const lanes=new Set(starts.filter(e=>e.race===rs.race).map(e=>e.task));
+      const evs=E.filter(e=>e.race===rs.race||(e.task&&lanes.has(e.task)));
+      await sleep(2600); await feed(take(evs),ev=>ev.type==="attempt"?1500:150);
+      const w=evs.find(e=>e.type==="race_winner"); if(w) cap(w.lane?`🏁 <b>${w.lane==="trained"?"Trained":"Day-0"} agent wins</b> in ${w.attempts} attempt${w.attempts>1?"s":""}.`:"Neither agent finished within the limit."); await sleep(4200);
+    }
+    // SCENE 5 · the trained agent back in the hurricane (if recorded)
+    const ts=starts.find(e=>e.phase==="imagine"&&+e.brief.distance_km>0);
+    if(ts){ go("s-storm"); cap("Back to the hurricane, now with the <b>trained agent</b>."); await sleep(2000); const evs=take(E.filter(e=>e.task===ts.task)); await feed(evs,0); await waitStorm();
+      const n=evs.filter(e=>e.type==="attempt").length; cap(`Trained agent: delivered in <b style="color:var(--ok)">${n} attempt${n>1?"s":""}</b>.`); await sleep(3800); }
+    go("s-machines"); cap("Every machine it built, drawn at true scale from its own design."); await sleep(4800);
+    cap(""); await card("The system that gets better: it learns physics from one drone's crashes, and keeps a lesson only if it helps machines it has never seen.","github.com/anantdwiv12/adaptmach · Meta Muse Spark (muse-spark-1.3)",5500);
+  }catch(e){ if(e!=="stop") console.error(e); }
+  cap(""); demoOn=false;
+}
+if(/[?&]demo=1/.test(location.search)) setTimeout(playDemo,800);
+
 resize(); renderStormSide(); requestAnimationFrame(frame); poll(); loadRuns(); setInterval(loadRuns,20000);
+</script>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+try{
+const stage=document.querySelector(".stage");
+const cvs=document.createElement("canvas"); cvs.style.cssText="position:absolute;inset:0;width:100%;height:100%;display:block";
+stage.insertBefore(cvs,document.getElementById("storm").nextSibling);
+const R=new THREE.WebGLRenderer({canvas:cvs,antialias:true});
+R.setPixelRatio(Math.min(2,devicePixelRatio)); R.toneMapping=THREE.ACESFilmicToneMapping; R.toneMappingExposure=1.45; R.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x111b2a); scene.fog=new THREE.FogExp2(0x16212f,0.0072);
+const cam=new THREE.PerspectiveCamera(42,2,0.1,700);
+const hemi=new THREE.HemisphereLight(0xb0c4e4,0x1a2028,1.15); scene.add(hemi);
+const moon=new THREE.DirectionalLight(0xc4d4ff,1.7); moon.position.set(-20,60,70); scene.add(moon);
+const flashL=new THREE.PointLight(0xd6e4ff,0,500,1.1); scene.add(flashL);
+let rs=7; const rnd=()=>{ rs=(rs*16807)%2147483647; return rs/2147483647; };
+const PADL=new THREE.Vector3(-46,0,0), PADR=new THREE.Vector3(50,0,0), WL=-36, WR=38, CRUISE=13;
+const hillH=(x,z)=>1.2+2.6*Math.sin(x*0.09)+1.8*Math.sin(x*0.21+z*0.13)+1.4*Math.sin(z*0.08+1.3);
+const groundY=x=>x<WL?0:x<WR?-0.35:Math.max(0,hillH(x,0))*Math.min(1,(x-WR)/3);
+PADR.y=groundY(PADR.x);
+// water
+const wg=new THREE.PlaneGeometry(WR-WL+6,240,100,140); wg.rotateX(-Math.PI/2); wg.translate((WL+WR)/2,-0.4,0);
+const wpos=wg.attributes.position, wbase=Float32Array.from(wpos.array);
+scene.add(new THREE.Mesh(wg,new THREE.MeshStandardMaterial({color:0x1a4a70,metalness:0.55,roughness:0.22,flatShading:true})));
+// San Francisco
+const sf=new THREE.Mesh(new THREE.BoxGeometry(90,1,240),new THREE.MeshStandardMaterial({color:0x1d2938,roughness:0.95})); sf.position.set(WL-45,-0.5,0); scene.add(sf);
+const NB=300, blds=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:0x2e4058,roughness:0.7,metalness:0.25}),NB), m4=new THREE.Matrix4(), wins=[];
+for(let i=0;i<NB;i++){ const far=rnd()<0.3, x=far?WL-40-rnd()*30:WL-3-rnd()*62, z=far?-70+rnd()*110:-72+rnd()*66, w=1.2+rnd()*2.8, d=1.2+rnd()*2.8, core=Math.abs(x-(WL-16))<14&&Math.abs(z+6)<16, h=(1.5+rnd()*rnd()*16)*(core?1.7:0.8);
+  if(Math.abs(x-PADL.x)<4.5&&Math.abs(z)<4.5){ m4.makeScale(1e-4,1e-4,1e-4); blds.setMatrixAt(i,m4); continue; }
+  m4.compose(new THREE.Vector3(x,h/2,z),new THREE.Quaternion(),new THREE.Vector3(w,h,d)); blds.setMatrixAt(i,m4);
+  for(let k=0;k<h*2;k++) if(rnd()<0.5) wins.push(x+(rnd()-0.5)*w*0.9, 0.3+rnd()*(h-0.4), z+d/2+0.03); }
+scene.add(blds);
+const wgeo=new THREE.BufferGeometry(); wgeo.setAttribute("position",new THREE.Float32BufferAttribute(wins,3));
+scene.add(new THREE.Points(wgeo,new THREE.PointsMaterial({color:0xffc878,size:0.2,transparent:true,opacity:0.9})));
+const tower=new THREE.Mesh(new THREE.ConeGeometry(1.7,28,4),new THREE.MeshStandardMaterial({color:0x26354a,roughness:0.5,metalness:0.5})); tower.position.set(WL-17,14,-14); scene.add(tower);
+const beacon=new THREE.Mesh(new THREE.SphereGeometry(0.35,8,8),new THREE.MeshBasicMaterial({color:0xff3b3b})); beacon.position.set(WL-17,28.3,-14); scene.add(beacon);
+// Fremont hills
+const hg=new THREE.PlaneGeometry(100,240,70,120); hg.rotateX(-Math.PI/2); hg.translate(WR+50,0,0);
+const hp=hg.attributes.position; for(let i=0;i<hp.count;i++){ const x=hp.getX(i), z=hp.getZ(i); hp.setY(i,Math.max(-0.5,hillH(x,z))*Math.min(1,Math.max(0,(x-WR)/3))-0.1); }
+scene.add(new THREE.Mesh(hg,new THREE.MeshStandardMaterial({color:0x24492f,roughness:1,flatShading:true})));
+const hl=[]; for(let i=0;i<260;i++){ const x=WR+5+rnd()*45, z=-60+rnd()*90; hl.push(x,hillH(x,z)+0.3,z); }
+const hlg=new THREE.BufferGeometry(); hlg.setAttribute("position",new THREE.Float32BufferAttribute(hl,3)); scene.add(new THREE.Points(hlg,new THREE.PointsMaterial({color:0xffd59a,size:0.24,transparent:true,opacity:0.85})));
+// pads + route
+const pad=(p,c)=>{ const g=new THREE.Group(); const ring=new THREE.Mesh(new THREE.TorusGeometry(2.2,0.13,8,48),new THREE.MeshBasicMaterial({color:c})); ring.rotation.x=Math.PI/2; g.add(ring);
+  const disc=new THREE.Mesh(new THREE.CircleGeometry(2.1,40),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.15})); disc.rotation.x=-Math.PI/2; g.add(disc);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,30,6),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.25})); beam.position.y=15; g.add(beam);
+  g.position.copy(p).add(new THREE.Vector3(0,0.06,0)); scene.add(g); return g; };
+pad(PADL,0xff7a1a); const padR=pad(PADR,0x33d17a);
+const rp=[]; for(let i=0;i<=140;i++){ const q=i/140, x=PADL.x+(PADR.x-PADL.x)*q, a=ease(Math.min(1,q/0.12,(1-q)/0.1)), g0=groundY(x); rp.push(new THREE.Vector3(x,g0+0.75+(CRUISE-g0)*a,0)); }
+const route=new THREE.Line(new THREE.BufferGeometry().setFromPoints(rp),new THREE.LineDashedMaterial({color:0x5ad1ff,dashSize:0.9,gapSize:0.9,transparent:true,opacity:0.5})); route.computeLineDistances(); scene.add(route);
+// clouds
+const ctex=(()=>{ const c=document.createElement("canvas"); c.width=c.height=128; const g=c.getContext("2d"), r=g.createRadialGradient(64,64,0,64,64,64); r.addColorStop(0,"rgba(255,255,255,0.75)"); r.addColorStop(1,"rgba(255,255,255,0)"); g.fillStyle=r; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c); })();
+const clouds=[]; for(let i=0;i<70;i++){ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:ctex,transparent:true,depthWrite:false,opacity:0.22+rnd()*0.25,color:0x5d6c82})); sp.position.set(-100+rnd()*210,22+rnd()*16,-80+rnd()*110); const k=22+rnd()*34; sp.scale.set(k,k*0.5,1); scene.add(sp); clouds.push(sp); }
+// rain
+const RN=5000, rg=new THREE.BufferGeometry(), ra=new Float32Array(RN*6), rv=new Float32Array(RN);
+for(let i=0;i<RN;i++){ const x=-90+rnd()*190, y=rnd()*46, z=-45+rnd()*85; ra.set([x,y,z,x,y+1,z],i*6); rv[i]=0.8+rnd()*0.5; }
+rg.setAttribute("position",new THREE.BufferAttribute(ra,3));
+const rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0xb4cce8,transparent:true,opacity:0.3})); rain.frustumCulled=false; scene.add(rain);
+// trail + splash
+const TN=180, tg=new THREE.BufferGeometry(), ta=new Float32Array(TN*3); tg.setAttribute("position",new THREE.BufferAttribute(ta,3)); tg.setDrawRange(0,0);
+const trail=new THREE.Line(tg,new THREE.LineBasicMaterial({color:0x5ad1ff,transparent:true,opacity:0.8})); trail.frustumCulled=false; scene.add(trail); let tc=0;
+const PN=600, pg=new THREE.BufferGeometry(), pp=new Float32Array(PN*3), pv=new Float32Array(PN*3); pg.setAttribute("position",new THREE.BufferAttribute(pp,3));
+const pmat=new THREE.PointsMaterial({color:0xaad8ff,size:0.22,transparent:true,opacity:0}); const pts=new THREE.Points(pg,pmat); pts.frustumCulled=false; scene.add(pts); let plife=0;
+function burst(x,y,water){ pmat.color.setHex(water?0xbfe4ff:0xffa040); for(let i=0;i<PN;i++){ pp.set([x,y,0],i*3); const a=Math.random()*Math.PI*2, sp=1+Math.random()*7; pv.set([Math.cos(a)*sp*0.7,3+Math.random()*10,Math.sin(a)*sp*0.7],i*3); } plife=1; }
+// drone built from the agent's design
+const CH={"li-ion":0x5aa9ff,"li-po":0xff9a3c,"li-s":0xb48cff};
+let drone=null, dkey=null, rotors=[], strobe=null;
+function buildDrone(d){
+  if(drone) scene.remove(drone); rotors=[];
+  const dd=d&&d.n_rotors!=null?d:{n_rotors:4,rotor_diameter_m:0.5,ducted:false,battery_chemistry:"li-ion"};
+  const G=geom(dd), K=2.2, g=new THREE.Group(), bw=Math.max(0.95,G.span*K*0.2);
+  const metal=new THREE.MeshStandardMaterial({color:0x8d99a6,metalness:0.7,roughness:0.35});
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(bw,0.42,bw*0.7),new THREE.MeshStandardMaterial({color:0xe3e9f0,metalness:0.3,roughness:0.3})));
+  const can=new THREE.Mesh(new THREE.SphereGeometry(bw*0.3,18,10,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x14202e,metalness:0.9,roughness:0.12})); can.position.y=0.2; g.add(can);
+  const cc=CH[dd.battery_chemistry]||0x5aa9ff, bat=new THREE.Mesh(new THREE.BoxGeometry(bw*0.72,0.12,bw*0.4),new THREE.MeshStandardMaterial({color:cc,emissive:cc,emissiveIntensity:0.8})); bat.position.y=-0.26; g.add(bat);
+  const box=new THREE.Mesh(new THREE.BoxGeometry(0.95,0.15,0.95),new THREE.MeshStandardMaterial({color:0xf2c26b,roughness:0.8})); box.position.y=-0.58; g.add(box);
+  const r=G.D/2*K;
+  G.pts.forEach((p,i)=>{
+    const px=p.x*K, pz=p.z*K, len=Math.hypot(px,pz);
+    const hold=new THREE.Group(), arm=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,len,6),metal); arm.rotation.z=Math.PI/2; arm.position.x=len/2; hold.add(arm); hold.rotation.y=-Math.atan2(pz,px); g.add(hold);
+    const hub=new THREE.Group(); hub.position.set(px,0.14,pz); g.add(hub);
+    const disk=new THREE.Mesh(new THREE.CircleGeometry(r,36),new THREE.MeshBasicMaterial({color:0xa6e6ff,transparent:true,opacity:0.14,side:THREE.DoubleSide,depthWrite:false})); disk.rotation.x=-Math.PI/2; hub.add(disk);
+    const bl=new THREE.Group(), b1=new THREE.Mesh(new THREE.BoxGeometry(r*2,0.035,Math.max(0.08,r*0.15)),new THREE.MeshStandardMaterial({color:0xeef8ff,metalness:0.3,roughness:0.4})); bl.add(b1); const b2=b1.clone(); b2.rotation.y=Math.PI/2; bl.add(b2); hub.add(bl); rotors.push(bl);
+    if(G.duct){ const du=new THREE.Mesh(new THREE.TorusGeometry(r*1.06,Math.max(0.07,r*0.11),12,44),new THREE.MeshStandardMaterial({color:0x5ad1ff,metalness:0.6,roughness:0.25,emissive:0x0c3a55,emissiveIntensity:0.8})); du.rotation.x=Math.PI/2; hub.add(du); }
+    const mo=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,0.24,12),metal); mo.position.y=-0.09; hub.add(mo);
+  });
+  [[0xff3030,-1],[0x30ff70,1]].forEach(([c,sg])=>{ const l=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),new THREE.MeshBasicMaterial({color:c})); l.position.set(sg*bw/2,0,bw*0.36); g.add(l); });
+  strobe=new THREE.PointLight(0xffffff,0,9); strobe.position.y=-0.3; g.add(strobe);
+  const glow=new THREE.PointLight(0x5ad1ff,1.6,12); glow.position.y=-0.9; g.add(glow);
+  scene.add(g); drone=g;
+}
+// labels
+const mk=t=>{ const d=document.createElement("div"); d.className="lbl3d"; d.textContent=t; stage.appendChild(d); return d; };
+const lA=mk("SAN FRANCISCO"), lB=mk("FREMONT · 45 km");
+function label(el,v){ const q=v.clone().project(cam); if(q.z>1||Math.abs(q.x)>1.1){ el.style.display="none"; return; } el.style.display=""; el.style.left=((q.x*0.5+0.5)*stage.clientWidth)+"px"; el.style.top=((-q.y*0.5+0.5)*stage.clientHeight)+"px"; }
+function size(){ const w=stage.clientWidth, h=stage.clientHeight; if(!w||!h) return; R.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(stage); size();
+let lastIt=undefined, last=performance.now(), flash=0, nextFlash=2.5, splashed=false;
+const camPos=new THREE.Vector3(-30,12,34), camLook=new THREE.Vector3(-46,3,-4);
+window.S3D={ok:true, draw(v,T){
+  const now=performance.now(), dt=Math.min(0.05,(now-last)/1000); last=now;
+  const it=v&&v.it, st=v&&v.st, b=it?it.t.brief:{wind_m_s:25,rain:true,distance_km:45}, wind=+(b.wind_m_s||0)||(it?0:25);
+  if(it!==lastIt){ lastIt=it; const k=JSON.stringify(it?it.ev.design||null:null); if(k!==dkey){ dkey=k; buildDrone(it&&it.ev.design); } tc=0; tg.setDrawRange(0,0); splashed=false;
+    const sfm=!it||/fremont|san francisco/i.test(b.prompt||""); lA.textContent=sfm?"SAN FRANCISCO":"LAUNCH"; lB.textContent=(sfm?"FREMONT":"DESTINATION")+" · "+(b.distance_km||45)+" km"; }
+  if(!drone) buildDrone(null);
+  let p=0,alt=0,rot=0,alpha=1; if(st){ p=st.p; alt=st.alt; rot=st.rot; alpha=st.alpha; } else alt=0.06+0.03*Math.sin(T*2);
+  const x=PADL.x+(PADR.x-PADL.x)*p, g0=groundY(x); let y=g0+0.75+(CRUISE-g0)*alt; if(st&&st.crash) y=g0-0.25;
+  drone.position.set(x,Math.max(y,g0-1.2),0);
+  const gust=(Math.sin(T*3.3)*0.06+Math.sin(T*7.1)*0.025)*(wind/25), flying=st&&alt>0.3&&!st.done;
+  drone.rotation.set(gust*0.7,0,-(flying?0.2:0)-rot-gust); drone.visible=alpha>0.3;
+  rotors.forEach((r,i)=>r.rotation.y+=(st&&st.crash?0:1)*dt*(38+i));
+  if(strobe) strobe.intensity=Math.sin(T*9)>0.9?7:0;
+  if(st&&alt>0.05&&!st.crash){ if(tc<TN){ ta.set([x,drone.position.y,0],tc*3); tc++; } else { ta.copyWithin(0,3); ta.set([x,drone.position.y,0],(TN-1)*3); } tg.attributes.position.needsUpdate=true; tg.setDrawRange(0,tc); }
+  if(st&&st.crash&&!splashed){ splashed=true; burst(x,g0+0.2,x>WL&&x<WR); }
+  if(plife>0){ plife-=dt*0.6; pmat.opacity=Math.max(0,plife); for(let i=0;i<PN;i++){ pv[i*3+1]-=16*dt; pp[i*3]+=pv[i*3]*dt; pp[i*3+1]+=pv[i*3+1]*dt; pp[i*3+2]+=pv[i*3+2]*dt; } pg.attributes.position.needsUpdate=true; }
+  padR.scale.setScalar(st&&st.arrived?1+0.3*Math.abs(Math.sin(T*5)):1);
+  const wa=wpos.array, ws=1.6+wind*0.05; for(let i=0;i<wpos.count;i++){ const bx=wbase[i*3], bz=wbase[i*3+2]; wa[i*3+1]=-0.4+Math.sin(bx*0.35+T*ws)*0.2+Math.cos(bz*0.27+T*1.3)*0.15+Math.sin((bx+bz)*0.6+T*2.2)*0.06; } wpos.needsUpdate=true;
+  const pa=ra, vx=-(wind*1.1+3), cx=drone.position.x; rain.visible=it?!!b.rain:true;
+  for(let i=0;i<RN;i++){ const o=i*6; let x0=pa[o]+vx*rv[i]*dt, y0=pa[o+1]-34*rv[i]*dt; if(y0<-0.5||x0<cx-95){ y0=38+Math.random()*8; x0=cx-60+Math.random()*150; } pa[o]=x0; pa[o+1]=y0; pa[o+3]=x0-vx*0.035; pa[o+4]=y0+1.15; pa[o+5]=pa[o+2]; }
+  rg.attributes.position.needsUpdate=true;
+  clouds.forEach(c=>{ c.position.x-=(wind*0.12+0.6)*dt; if(c.position.x<-110) c.position.x=110; });
+  nextFlash-=dt; if(nextFlash<0&&wind>12){ flash=1; nextFlash=3+Math.random()*6; flashL.position.set(cx-25+Math.random()*60,55,-35); }
+  flashL.intensity=flash*flash*2500; hemi.intensity=0.6+flash*1.1; flash=Math.max(0,flash-dt*2.6);
+  beacon.material.color.setHex(Math.sin(T*3)>0?0xff3b3b:0x2a0808);
+  const tgt=drone.position.clone(), desired=it?tgt.clone().add(new THREE.Vector3(-9,5,21)):new THREE.Vector3(PADL.x+4+Math.sin(T*0.15)*6,8,26);
+  camPos.lerp(desired,1-Math.pow(0.03,dt)); camLook.lerp(it?tgt.clone().add(new THREE.Vector3(6,0,0)):tgt.clone().add(new THREE.Vector3(-4,2,-6)),1-Math.pow(0.01,dt));
+  cam.position.copy(camPos); cam.lookAt(camLook);
+  label(lA,new THREE.Vector3(WL-17,31,-14)); label(lB,new THREE.Vector3(PADR.x,PADR.y+5,0));
+  R.render(scene,cam);
+}};
+
+// ---------------- 3D machine viewer (prototyping section)
+const FRAMEHEX={carbon:0x7d8a98,aluminum:0xc9d3dd,steel:0x8d99a6};
+const mc=document.createElement("canvas"); mc.style.cssText="width:100%;height:100%;display:block;border-radius:12px";
+const MR=new THREE.WebGLRenderer({canvas:mc,antialias:true}); MR.setPixelRatio(Math.min(2,devicePixelRatio)); MR.toneMapping=THREE.ACESFilmicToneMapping; MR.toneMappingExposure=1.2; MR.outputColorSpace=THREE.SRGBColorSpace;
+const ms=new THREE.Scene(); ms.background=new THREE.Color(0x0a1626); ms.fog=new THREE.Fog(0x0a1626,10,26);
+const mcam=new THREE.PerspectiveCamera(35,16/9,0.05,100);
+ms.add(new THREE.HemisphereLight(0xd6e8ff,0x0a1626,1.3)); const mkey=new THREE.DirectionalLight(0xffffff,1.8); mkey.position.set(4,8,6); ms.add(mkey); const mrim=new THREE.DirectionalLight(0x5ad1ff,1.4); mrim.position.set(-6,4,-6); ms.add(mrim);
+const mgrid=new THREE.GridHelper(24,48,0x2f7aa6,0x173852); ms.add(mgrid);
+const mring=new THREE.Mesh(new THREE.RingGeometry(0.98,1,64),new THREE.MeshBasicMaterial({color:0x33d17a,transparent:true,opacity:0.7,side:THREE.DoubleSide})); mring.rotation.x=-Math.PI/2; mring.position.y=0.005; ms.add(mring);
+let mg=null, mkk=null, mrot=[], mspan=2; const mcenter=new THREE.Vector3(0,1,0);
+function buildMachine(d,b){
+  if(mg) ms.remove(mg); mrot=[]; mg=new THREE.Group(); ms.add(mg); b=b||{};
+  if(!d||d.n_rotors==null){ mring.visible=false; return; }
+  const G=geom(d), kind=kindOf(b), human=kind==="human"||kind==="deck";
+  const rotorH=kind==="deck"?0.24:kind==="human"?1.28:0.38+0.13*G.span;
+  const metal=new THREE.MeshStandardMaterial({color:FRAMEHEX[d.frame_material]||0x9fb3c8,metalness:0.75,roughness:0.28});
+  const skin=new THREE.MeshStandardMaterial({color:0xdde6ef,metalness:0.15,roughness:0.55});
+  const cc=CH[d.battery_chemistry]||0x5aa9ff, batM=new THREE.MeshStandardMaterial({color:cc,emissive:cc,emissiveIntensity:0.55,metalness:0.3,roughness:0.4});
+  const hub=new THREE.Vector3(0,rotorH,0);
+  if(human){
+    const base=kind==="deck"?rotorH+0.06:0;
+    if(kind==="deck"){ const w=Math.max(0.5,G.span*0.36), dk=new THREE.Mesh(new THREE.BoxGeometry(w*2,0.07,0.55),metal); dk.position.y=rotorH+0.03; mg.add(dk); }
+    [-0.1,0.1].forEach(x=>{ const l=new THREE.Mesh(new THREE.CapsuleGeometry(0.065,0.78,4,10),skin); l.position.set(x,base+0.46,0); mg.add(l); });
+    const torso=new THREE.Mesh(new THREE.CapsuleGeometry(0.19,0.38,4,14),skin); torso.position.y=base+1.2; mg.add(torso);
+    [-1,1].forEach(sg=>{ const a=new THREE.Mesh(new THREE.CapsuleGeometry(0.05,0.55,4,8),skin); a.position.set(sg*0.27,base+1.13,0); a.rotation.z=sg*0.16; mg.add(a); });
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.115,22,16),skin); head.position.y=base+1.63; mg.add(head);
+    if(/iron|suit/i.test(b.name||"")){ const arc=new THREE.Mesh(new THREE.CircleGeometry(0.055,24),new THREE.MeshBasicMaterial({color:0xc8f6ff})); arc.position.set(0,base+1.3,0.205); mg.add(arc); const pl=new THREE.PointLight(0x5ad1ff,3,1.6); pl.position.set(0,base+1.3,0.4); mg.add(pl); }
+    const pack=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.52,0.2),batM); pack.position.set(0,base+1.22,-0.24); mg.add(pack);
+    hub.set(0,rotorH,-0.24);
+  } else {
+    const fw=Math.min(1.3,Math.max(0.18,0.2*G.span+0.12)), fh=Math.min(0.35,Math.max(0.07,0.07+0.04*G.span));
+    const body=new THREE.Mesh(new THREE.BoxGeometry(fw,fh,fw*0.7),new THREE.MeshStandardMaterial({color:0xe3e9f0,metalness:0.3,roughness:0.3})); body.position.y=rotorH-fh/2+0.02; mg.add(body);
+    const bat=new THREE.Mesh(new THREE.BoxGeometry(fw*0.6,fh*0.35,fw*0.4),batM); bat.position.y=rotorH+0.04; mg.add(bat);
+    const pk=Math.cbrt(Math.max(0.3,+b.payload_kg||2)), pw=Math.min(0.7,Math.max(0.12,0.12*pk)), ph=kind==="pizza"?pw*0.18:pw*0.75;
+    const pay=new THREE.Mesh(new THREE.BoxGeometry(pw,ph,pw),new THREE.MeshStandardMaterial({color:({pizza:0xf2c26b,camera:0x2b3440,medic:0xf4f6f8,cargo:0xb88a55})[kind]||0xb88a55,roughness:0.8})); pay.position.y=Math.max(ph/2,rotorH-fh-0.05-ph/2); mg.add(pay);
+    [-1,1].forEach(sx=>[-1,1].forEach(sz=>{ const h=Math.max(0.05,rotorH-fh), lg=new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,h,6),metal); lg.position.set(sx*fw*0.42,h/2,sz*fw*0.3); mg.add(lg); }));
+  }
+  const r=G.D/2;
+  G.pts.forEach((p,i)=>{
+    const dx=p.x-hub.x, dz=p.z-hub.z, len=Math.hypot(dx,dz);
+    const hold=new THREE.Group(); hold.position.copy(hub); const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,len,6),metal); arm.rotation.z=Math.PI/2; arm.position.x=len/2; hold.add(arm); hold.rotation.y=-Math.atan2(dz,dx); mg.add(hold);
+    const h=new THREE.Group(); h.position.set(p.x,rotorH+0.03,p.z); mg.add(h);
+    const disk=new THREE.Mesh(new THREE.CircleGeometry(r,44),new THREE.MeshBasicMaterial({color:0x8fdcff,transparent:true,opacity:0.16,side:THREE.DoubleSide,depthWrite:false})); disk.rotation.x=-Math.PI/2; h.add(disk);
+    const bl=new THREE.Group(), b1=new THREE.Mesh(new THREE.BoxGeometry(r*2,0.014,Math.max(0.03,r*0.12)),new THREE.MeshStandardMaterial({color:0xf2f8ff,metalness:0.3,roughness:0.3})); bl.add(b1); h.add(bl); mrot.push(bl);
+    if(G.duct){ const du=new THREE.Mesh(new THREE.TorusGeometry(r*1.06,Math.max(0.025,r*0.09),12,52),new THREE.MeshStandardMaterial({color:0x5ad1ff,metalness:0.6,roughness:0.22,emissive:0x0c3a55,emissiveIntensity:0.8})); du.rotation.x=Math.PI/2; h.add(du); }
+    const mo=new THREE.Mesh(new THREE.CylinderGeometry(Math.max(0.03,r*0.1),Math.max(0.03,r*0.1),0.08,12),metal); mo.position.y=-0.04; h.add(mo);
+  });
+  const box=new THREE.Box3().setFromObject(mg), sz=box.getSize(new THREE.Vector3()); box.getCenter(mcenter);
+  mspan=Math.max(sz.x,sz.y*1.25,sz.z,1.0); mring.visible=true; mring.scale.setScalar(Math.max(sz.x,sz.z)*0.62+0.2);
+}
+let mT=0, mlast=performance.now();
+(function mloop(){ requestAnimationFrame(mloop); if(!mc.isConnected) return; const now=performance.now(), dt=Math.min(0.05,(now-mlast)/1000); mlast=now; mT+=dt;
+  const w=mc.clientWidth, h=mc.clientHeight, pr=MR.getPixelRatio(); if(w&&h&&(mc.width!==Math.round(w*pr)||mc.height!==Math.round(h*pr))){ MR.setSize(w,h,false); mcam.aspect=w/h; mcam.updateProjectionMatrix(); }
+  const dist=mspan*1.3+0.7, a=mT*0.32; mcam.position.set(mcenter.x+Math.sin(a)*dist,mcenter.y+dist*0.32,mcenter.z+Math.cos(a)*dist); mcam.lookAt(mcenter);
+  mrot.forEach((r,i)=>r.rotation.y+=dt*(32+i)); MR.render(ms,mcam); })();
+window.M3D={canvas:mc, show(d,b,state){ const k=JSON.stringify([d,b&&b.name,b&&b.planet]); if(k!==mkk){ mkk=k; buildMachine(d,b); const bg=({mars:0x2a130c,titan:0x261d09})[String(b&&b.planet||"").toLowerCase()]||0x0a1626; ms.background.setHex(bg); ms.fog.color.setHex(bg); }
+  mring.material.color.setHex(state==="good"?0x33d17a:state==="bad"?0xff4d5e:0x5ad1ff); }};
+document.getElementById("storm").style.display="none";
+}catch(e){ console.warn("3D storm unavailable, falling back to 2D",e); }
 </script>
 </body>
 </html>
