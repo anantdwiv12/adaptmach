@@ -2,6 +2,8 @@
 
 **An AI engineer that designs machines in code, and teaches itself physics from its own failures.**
 
+▶ **Demo video (1:50):** https://cdn.jsdelivr.net/gh/anantdwiv12/adaptmach@main/demo/AdaptMach-demo.mp4
+
 Built at the AIE Code Summit 2026 Hackathon (Cerebral Valley · Shack15), Nov 7 2026.
 Problem statement: **The System That Gets Better**.
 
