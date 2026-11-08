@@ -788,19 +788,19 @@ async function playDemo(){
       const candTasks=starts.filter(e=>e.phase==="candidate"&&e._k>cand._k&&e._k<dec._k).map(e=>e.task);
       cap(`Now they're built again, live, <b>with the drone's lesson</b>.`);
       await feed(take(E.filter(e=>candTasks.includes(e.task))),ev=>ev.type==="attempt"?650:150);
-      await feed(take([dec]),0);
-      cap(dec.type==="adopt"?`✅ <b>The lesson transfers.</b> Other machines: ${dec.before.toFixed(1)} → <b style="color:var(--ok)">${dec.after.toFixed(1)}</b> attempts. Adopted as agent v${dec.version}.`:`↩ <b style="color:var(--bad)">It didn't transfer</b> (${dec.before.toFixed(1)} → ${dec.after.toFixed(1)} attempts), so it's rolled back. Only lessons that help other machines are kept.`);
+      await feed(take([dec]),0); const blocked=E.filter(e=>candTasks.includes(e.task)&&e.type==="attempt"&&/^model error/.test(e.error||"")).length;
+      cap(dec.type==="adopt"?`✅ <b>The lesson transfers.</b> Other machines: ${dec.before.toFixed(1)} → <b style="color:var(--ok)">${dec.after.toFixed(1)}</b> attempts. Adopted as agent v${dec.version}.`:`↩ <b style="color:var(--bad)">Not kept</b> (${dec.before.toFixed(1)} → ${dec.after.toFixed(1)} attempts${blocked?`; ${blocked} attempts were blocked by the model API's content filter`:""}). Only lessons that measurably help other machines are adopted.`);
       await sleep(4500); }
     // SCENE 3b · the rest of training, fast
     const end=E.find(e=>e.type==="run_end");
-    const rest=E.filter(e=>!used.has(e._k)&&end&&e._k<=end._k&&!(e.race));
-    if(rest.length){ go("s-learn"); cap(`It keeps going: more training jobs, more lessons, and each one is tested on the other machines.`);
+    const rest=E.filter(e=>!used.has(e._k)&&(!end||e._k<=end._k)&&!(e.race)&&e.type!=="note");
+    if(rest.length){ go("lab"); cap(`It keeps going: the next drone is prototyped live, writes a new lesson, and that lesson is tested on the other machines too.`);
       await feed(take(rest),ev=>{ switch(ev.type){
         case "candidate": cap(`🧪 New lesson <b>${esc(ev.skill.name)}</b>: does it help the other machines?`); return 1500;
         case "adopt": cap(`✅ Kept: other machines ${ev.before.toFixed(1)} → <b style="color:var(--ok)">${ev.after.toFixed(1)}</b> attempts (agent v${ev.version}).`); return 2400;
         case "rollback": cap(`↩ Rolled back <b>${esc(ev.skill.name)}</b>: it didn't help.`); return 1600;
         case "run_end": cap(`Learning complete: other machines go from <b>${ev.baseline.toFixed(1)} → <span style="color:var(--ok)">${ev.final.toFixed(1)}</span></b> attempts.`); return 4200;
-        case "attempt": return 90;
+        case "attempt": return 420;
         default: return 30; } }); }
     // SCENE 4 · new machines, before vs after learning
     for(const rs of E.filter(e=>e.type==="race_start")){
