@@ -775,7 +775,7 @@ async function playDemo(){
     if(first){ go("s-storm"); cap(`<b>Day 0.</b> The agent has never built anything. Mission: carry a pizza <b>San Francisco → Fremont</b>, 45 km through 25 m/s hurricane winds and rain. It writes the drone's design in Python, and physics flies it.`);
       await sleep(2800); const evs=take(E.filter(e=>e.task===first.task)); firstEnd=evs[evs.length-1]._k; await feed(evs,0); await waitStorm();
       const n=evs.filter(e=>e.type==="attempt").length, ok=evs.some(e=>e.type==="task_end"&&e.solved);
-      cap(ok?`🍕 Delivered on attempt <b>${n}</b>. Every crash before it was a real physics result.`:`Day 0 could not get through in ${n} attempts.`); await sleep(3800); }
+      cap(ok?`🍕 Delivered on attempt <b>${n}</b>. Every crash before it was a real physics result.`:`Day 0 could not get through in ${n} attempts.`); await sleep(3800);  cap(`<b>Grounded in physics:</b> every design is graded by our own simulator. Rotor thrust and power come from momentum theory with real-rotor losses, plus battery energy and C-rate limits and mass that builds up from parts. Missions add forward-flight drag (∝ v³), headwind, gust margin and rain. The 3D flight replays exactly what it computed.`); await sleep(9000); }
     // SCENE 2 · what it learned from the drone
     const refl=E.find(e=>e.type==="reflecting"&&e._k>firstEnd), cand=E.find(e=>e.type==="candidate"&&e._k>firstEnd);
     if(refl&&cand){ go("s-learn"); await feed(take([refl]),0); cap(`🧠 It reviews the drone's crashes and writes down what it learned…`); await sleep(2600);
